@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MallPark — Smart Mall Parking Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div>
+            <h2 style="display: flex; align-items: center; gap: 8px; margin-bottom: 32px; color: var(--primary);">
+                <i data-lucide="parking-square"></i> MallPark
+            </h2>
+            <nav style="display: flex; flex-direction: column; gap: 8px;">
+                <button class="tab-btn active"><i data-lucide="layout-dashboard"></i> Dashboard</button>
+                <button class="tab-btn"><i data-lucide="layers"></i> Floor View</button>
+                <button class="tab-btn"><i data-lucide="bar-chart-3"></i> Analytics</button>
+            </nav>
+        </div>
+        
+        <!-- Dark Mode Toggle -->
+        <button id="theme-toggle" class="tab-btn" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i data-lucide="moon"></i> Switch Theme
+        </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+            <div>
+                <h1>Smart Parking Dashboard</h1>
+                <p style="color: var(--text-muted);">Real-time floor tracking and space allocation</p>
+            </div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <input type="text" id="slot-search" placeholder="Search slot (e.g., A12)..." style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);">
+                <i data-lucide="bell"></i>
+            </div>
+        </header>
+
+        <!-- KPI Metrics Header -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.875rem;">Total Capacity</span>
+                    <div class="stat-value" id="stat-total">280</div>
+                </div>
+                <i data-lucide="building" style="color: var(--primary);"></i>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.875rem;">Available Slots</span>
+                    <div class="stat-value" id="stat-available" style="color: var(--success);">0</div>
+                </div>
+                <i data-lucide="check-circle" style="color: var(--success);"></i>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.875rem;">Occupied Slots</span>
+                    <div class="stat-value" id="stat-occupied" style="color: var(--danger);">0</div>
+                </div>
+                <i data-lucide="x-circle" style="color: var(--danger);"></i>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.875rem;">Occupancy Rate</span>
+                    <div class="stat-value" id="stat-rate">0%</div>
+                </div>
+                <i data-lucide="pie-chart" style="color: var(--warning);"></i>
+            </div>
+        </section>
+
+        <!-- Controls: Filters & Floor Tabs -->
+        <section style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div class="floor-tabs" id="floor-tabs-container">
+                <!-- Floor buttons dynamically generated -->
+            </div>
+
+            <!-- Filters -->
+            <div style="display: flex; gap: 12px;">
+                <select id="type-filter" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);">
+                    <option value="ALL">All Vehicle Types</option>
+                    <option value="CAR">Car</option>
+                    <option value="BIKE">Bike</option>
+                    <option value="EV">EV Charging</option>
+                    <option value="ACCESSIBLE">Accessible</option>
+                </select>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" id="available-only"> Available Only
+                </label>
+            </div>
+        </section>
+
+        <!-- Main Parking Layout -->
+        <section class="parking-grid" id="parking-grid-container">
+            <!-- Dynamic Slots Injected Here -->
+        </section>
+
+        <!-- Analytics Section -->
+        <section style="margin-top: 40px; display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+            <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                <h3>Occupancy Breakdown</h3>
+                <canvas id="pieChart" style="margin-top: 16px;"></canvas>
+            </div>
+            <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                <h3>Floor Distribution</h3>
+                <canvas id="barChart" style="margin-top: 16px;"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notifications Engine -->
+    <div id="toast-container"></div>
+
+    <!-- Modal Box -->
+    <div id="slot-modal-overlay" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h2 id="modal-slot-id" style="margin-bottom: 16px;">Slot Details</h2>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;" id="modal-body">
+                <!-- Detailed info dynamically injected -->
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button onclick="closeModal()" class="tab-btn">Close</button>
+                <button id="modal-reserve-btn" class="tab-btn active">Reserve Space</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
